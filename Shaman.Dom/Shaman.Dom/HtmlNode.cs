@@ -1125,13 +1125,22 @@ namespace Shaman.Dom
             }
             if (attributeValue.IndexOf(' ') != -1)
             {
-                foreach (string current in HtmlNode.GetClasses(attributeValue))
+
+                for (int i = 0; i < attributeValue.Length; i++)
                 {
-                    if (current == @class)
+                    if (attributeValue[i] != ' ')
                     {
-                        return true;
+                        int num = (i == attributeValue.Length - 1) ? -1 : attributeValue.IndexOf(' ', i + 1);
+                        if (num == -1)
+                        {
+                            if (attributeValue.AsValueString().Substring(i) == @class) return true;
+                            break;
+                        }
+                        if (attributeValue.AsValueString().Substring(i, num - i) == @class) return true;
+                        i = num;
                     }
                 }
+
                 return false;
             }
             return attributeValue == @class;
