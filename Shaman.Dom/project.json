@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1.9",
+  "version": "1.0.1.15",
   "authors": [
     "Andrea Martinelli"
   ],
@@ -23,19 +23,9 @@
     "keyFile": "Shaman.Dom.snk"
   },
   "dependencies": {
-    "Shaman.ValueString": "1.0.2.9"
+    "Shaman.ValueString": "1.0.2.15"
   },
   "frameworks": {
-    "dotnet5.4": {
-      "dependencies": {
-        "System.Runtime": "4.0.21-beta-23302",
-        "System.IO": "4.0.11-beta-23302",
-        "System.Threading.Tasks": "4.0.11-beta-23302",
-        "System.Text.Encoding": "4.0.11-beta-23302",
-        "System.Linq": "4.0.1-beta-23225",
-        "System.Xml.ReaderWriter": "4.0.11-beta-23516"
-      }
-    },
     "net45": {
       "frameworkAssemblies": {
         "System.Xml": "4.0.0"
@@ -44,6 +34,11 @@
     "net35": {
       "frameworkAssemblies": {
         "System.Xml": "2.0.0"
+      }
+    },
+    "netstandard1.3": {
+      "dependencies": {
+        "System.Xml.ReaderWriter": "4.0.11"
       }
     }
   }
