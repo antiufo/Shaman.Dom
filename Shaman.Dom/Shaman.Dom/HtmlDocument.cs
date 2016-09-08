@@ -1280,5 +1280,110 @@ namespace Shaman.Dom
         {
             this.DocumentNode.WriteTo(writer, writeDocumentNode);
         }
+
+        public void SetOwnerDocumentRecursive(HtmlNode node)
+        {
+            foreach (var item in node.DescendantsAndSelf())
+            {
+                item._ownerdocument = this;
+                item._streamposition = -1;
+            }
+        }
+
+
+
+        internal static Uri GetAbsoluteUrlInternal(Uri baseUrl, string relative)
+        {
+
+            if (relative.StartsWith("http:") || relative.StartsWith("https:"))
+                return new Uri(relative);
+
+            if (relative.StartsWith("//"))
+                return new Uri((baseUrl != null ? baseUrl.Scheme : "https") + ":" + relative);
+
+            var firstColon = relative.IndexOf(':', 0, Math.Min(relative.Length, 15));
+            var firstSlash = relative.IndexOf('/');
+            var firstQuestionMark = relative.IndexOf('?');
+            if (firstColon != -1 && (firstSlash == -1 || firstColon < firstSlash) && (firstQuestionMark == -1 || firstColon < firstQuestionMark))
+                return new Uri(relative);
+
+            if (baseUrl == null) throw new ArgumentException("Cannot create an absolute Uri without a base Uri.");
+
+            return new Uri(baseUrl, relative);
+
+        }
+
+        public Uri BaseUrl
+        {
+            get
+            {
+                if (_baseUrl != null) return _baseUrl;
+
+
+                var b = DocumentNode.GetAttributeValue("base-url");
+                if (b == null)
+                {
+                    foreach (var basenode in DocumentNode.DescendantsAndSelf("base"))
+                    {
+                        var h = basenode.GetAttributeValue("href");
+                        if (h != null)
+                        {
+                            try
+                            {
+                                _baseUrl = GetAbsoluteUrlInternal(PageUrl, h);
+                                b = _baseUrl.AbsoluteUri;
+                            }
+                            catch
+                            {
+                            }
+                            break;
+                        }
+                    }
+                    if (b == null)
+                    {
+                        _baseUrl = PageUrl;
+                        b = _baseUrl != null ? _baseUrl.AbsoluteUri : string.Empty;
+                    }
+                    DocumentNode.SetAttributeValue("base-url", b);
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(b)) return null;
+                    _baseUrl = new Uri(b);
+                }
+                return _baseUrl;
+            }
+        }
+
+        public Uri PageUrl
+        {
+            get
+            {
+                if (_pageUrl != null) return _pageUrl;
+
+                var m = DocumentNode.GetAttributeValue("document-url");
+                if (string.IsNullOrEmpty(m)) return null;
+
+                _pageUrl = new Uri(m);
+
+                return _pageUrl;
+            }
+            set
+            {
+                if (value != null) DocumentNode.SetAttributeValue("document-url", value.AbsoluteUri);
+                else DocumentNode.Attributes.Remove("document-url");
+                _pageUrl = value;
+            }
+        }
+
+        private Uri _baseUrl;
+        private Uri _pageUrl;
+
+        public void ClearPageUrlCache()
+        {
+            _pageUrl = null;
+            _baseUrl = null;
+        }
+        
     }
 }
