@@ -1123,6 +1123,23 @@ namespace Shaman.Dom
             {
                 return false;
             }
+#if SALTARELLE
+            // avoids infinite loop later
+            if (@class.Length == 0) return false;
+            var idx = 0;
+            while (true)
+            {
+                idx = attributeValue.IndexOf(@class, idx);
+                if (idx == -1) return false;
+                var before = attributeValue.CharCodeAt(idx - 1);
+                var after = attributeValue.CharCodeAt(idx + @class.Length);
+                if (
+                    (before == ' ' || double.IsNaN((int)before)) &&
+                    (after == ' ' || double.IsNaN((int)after))
+                    ) return true;
+                idx += @class.Length; 
+            }
+#else
             if (attributeValue.IndexOf(' ') != -1)
             {
 
