@@ -1161,41 +1161,39 @@ namespace Shaman.Dom
                 return false;
             }
             return attributeValue == @class;
+#endif
         }
         internal void WriteAttribute(TextWriter outText, HtmlAttribute att)
         {
-            string text = (att.QuoteType == AttributeValueQuote.DoubleQuote) ? "\"" : "'";
-            string text2;
+            string quote = (att.QuoteType == AttributeValueQuote.DoubleQuote) ? "\"" : "'";
+            string name;
             if (this._ownerdocument.OptionOutputAsXml)
             {
-                text2 = (this._ownerdocument.OptionOutputUpperCase ? att.XmlName.ToUpper() : att.XmlName);
+                name = (this._ownerdocument.OptionOutputUpperCase ? att.XmlName.ToUpper() : att.XmlName);
                 if (this._ownerdocument.OptionOutputOriginalCase)
                 {
-                    text2 = att.OriginalName;
+                    name = att.OriginalName;
                 }
                 outText.Write(string.Concat(new string[]
                 {
                     " ",
-                    text2,
+                    name,
                     "=",
-                    text,
+                    quote,
                     HtmlEntity.Entitize(att.XmlValue),
-                    text
+                    quote
                 }));
                 return;
             }
-            text2 = (this._ownerdocument.OptionOutputUpperCase ? att.Name.ToUpper() : (this.OwnerDocument.OptionOutputOriginalCase ? att.OriginalName : att.Name));
+            name = (this._ownerdocument.OptionOutputUpperCase ? att.Name.ToUpper() : (this.OwnerDocument.OptionOutputOriginalCase ? att.OriginalName : att.Name));
             if (!this._ownerdocument.OptionOutputOptimizeAttributeValues)
             {
-                outText.Write(string.Concat(new string[]
-                {
-                    " ",
-                    text2,
-                    "=",
-                    text,
-                    att.Value,
-                    text
-                }));
+                outText.Write(' ');
+                outText.Write(name);
+                outText.Write('=');
+                outText.Write(quote);
+                outText.Write(HtmlEntity.Entitize(att.Value));
+                outText.Write(quote);
                 return;
             }
             if (att.Value.IndexOfAny(new char[]
@@ -1206,17 +1204,17 @@ namespace Shaman.Dom
                 ' '
             }) < 0)
             {
-                outText.Write(" " + text2 + "=" + att.Value);
+                outText.Write(" " + name + "=" + HtmlEntity.Entitize(att.Value));
                 return;
             }
             outText.Write(string.Concat(new string[]
             {
                 " ",
-                text2,
+                name,
                 "=",
-                text,
-                att.Value,
-                text
+                quote,
+                HtmlEntity.Entitize(att.Value),
+                quote
             }));
         }
         internal void WriteAttributes(TextWriter outText, bool closing)
