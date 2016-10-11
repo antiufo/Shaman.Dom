@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1.15",
+  "version": "1.0.1.16",
   "authors": [
     "Andrea Martinelli"
   ],
@@ -19,14 +19,19 @@
     "htmlagilitypack",
     "performance"
   ],
-  "compilationOptions": {
-    "keyFile": "Shaman.Dom.snk"
+  "buildOptions": {
+    "keyFile": "Shaman.Dom.snk",
+    "compile": {
+      "exclude": [
+        "Shaman.Dom.Saltarelle"
+      ]
+    }
   },
   "dependencies": {
-    "Shaman.ValueString": "1.0.2.15"
+    "Shaman.ValueString": "1.0.2.19"
   },
   "frameworks": {
-    "net45": {
+    "net46": {
       "frameworkAssemblies": {
         "System.Xml": "4.0.0"
       }
