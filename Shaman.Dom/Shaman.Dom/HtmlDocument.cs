@@ -358,7 +358,7 @@ namespace Shaman.Dom
 		}
 		public void Save(StreamWriter writer)
 		{
-			this.Save(writer);
+			this.Save((TextWriter)writer);
 		}
 #endif
         public void Save(TextWriter writer)
@@ -1317,6 +1317,10 @@ namespace Shaman.Dom
         {
             get
             {
+#if !SALTARELLE
+                if (_baseUrlCustom != null) return CustomPageUrlTypeConverter(_baseUrlCustom);
+#endif
+
                 if (_baseUrl != null) return _baseUrl;
 
 
@@ -1359,6 +1363,9 @@ namespace Shaman.Dom
         {
             get
             {
+#if !SALTARELLE
+                if (_pageUrlCustom != null) return CustomPageUrlTypeConverter(_pageUrlCustom);
+#endif
                 if (_pageUrl != null) return _pageUrl;
 
                 var m = DocumentNode.GetAttributeValue("document-url");
@@ -1370,17 +1377,29 @@ namespace Shaman.Dom
             }
             set
             {
+#if !SALTARELLE
+                _pageUrlCustom = null;
+#endif
                 if (value != null) DocumentNode.SetAttributeValue("document-url", value.AbsoluteUri);
                 else DocumentNode.Attributes.Remove("document-url");
                 _pageUrl = value;
             }
         }
 
+#if !SALTARELLE
+        public object _pageUrlCustom;
+        public object _baseUrlCustom;
+        public static Func<object, Uri> CustomPageUrlTypeConverter;
+#endif
         private Uri _baseUrl;
         private Uri _pageUrl;
 
         public void ClearPageUrlCache()
         {
+#if !SALTARELLE
+            _pageUrlCustom = null;
+            _baseUrlCustom = null;
+#endif
             _pageUrl = null;
             _baseUrl = null;
         }
