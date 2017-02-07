@@ -39,6 +39,7 @@ namespace Shaman.Dom
             HtmlEntity._entityName = new Dictionary<int, string>();
             HtmlEntity._entityValue = new Dictionary<string, int>();
 #endif
+            HtmlEntity.AddPair("apos", 39);
             HtmlEntity.AddPair("nbsp", 160);
             HtmlEntity.AddPair("iexcl", 161);
             HtmlEntity.AddPair("cent", 162);
