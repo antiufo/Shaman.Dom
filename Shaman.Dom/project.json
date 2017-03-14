@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1.18",
+  "version": "1.0.1.20",
   "authors": [
     "Andrea Martinelli"
   ],
@@ -28,7 +28,7 @@
     }
   },
   "dependencies": {
-    "Shaman.ValueString": "1.0.2.19"
+    "Shaman.ValueString": "1.0.2.29"
   },
   "frameworks": {
     "net46": {

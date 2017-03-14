@@ -32,7 +32,7 @@ namespace Shaman.Dom
             QuotedAttributeValue,
             PcData
         }
-        private int _c;
+        private char _c;
         private int _currentAttributeIndex = -1;
         private HtmlNode _currentnode;
 #if !SALTARELLE
@@ -57,6 +57,7 @@ namespace Shaman.Dom
 #else
         internal LazyTextReader Text;
 #endif
+        public bool OptionParseAsXml { get { return !_isHtml; } set { _isHtml = !value; } }
         internal bool OptionAddDebuggingAttributes;
         internal bool OptionAutoCloseOnEnd;
         internal bool OptionCheckSyntax = true;
@@ -477,7 +478,7 @@ namespace Shaman.Dom
             }
             else
             {
-                if (this.OptionFixNestedTags && this.FindResetterNodes(htmlNode, this.GetResetters(this._currentnode.TagName)))
+                if (_isHtml && this.OptionFixNestedTags && this.FindResetterNodes(htmlNode, this.GetResetters(this._currentnode.TagName)))
                 {
                     flag = true;
                 }
@@ -606,7 +607,7 @@ namespace Shaman.Dom
         }
         private bool NewCheck(bool nextIsLetter)
         {
-            if (this._c != 60 || !nextIsLetter)
+            if (this._c != '<' || !nextIsLetter)
             {
                 return false;
             }
@@ -647,7 +648,7 @@ namespace Shaman.Dom
         {
             int num = 0;
             this.Lastnodes = new StringToHtmlNodeDictionary();
-            this._c = 0;
+            this._c = '\0';
             this._fullcomment = false;
             this._line = 1;
             this._lineposition = 1;
@@ -661,7 +662,7 @@ namespace Shaman.Dom
             this.PushNodeStart(HtmlNodeType.Text, 0);
             while (this._index != -1 && this.Text.ContainsIndex(this._index))
             {
-                this._c = (int)this.Text[this._index];
+                this._c = this.Text[this._index];
                 bool nextIsLetter = false;
                 if (this.Text.ContainsIndex(this._index + 1))
                 {
@@ -679,7 +680,7 @@ namespace Shaman.Dom
                     case HtmlDocument.ParseState.WhichTag:
                         if (!this.NewCheck(nextIsLetter))
                         {
-                            if (this._c == 47)
+                            if (this._c == '/')
                             {
                                 this.PushNodeNameStart(false, this._index);
                             }
@@ -704,7 +705,7 @@ namespace Shaman.Dom
                             }
                             else
                             {
-                                if (this._c == 47)
+                                if (this._c == '/')
                                 {
                                     this.PushNodeNameEnd(this._index - 1);
                                     if (this._state == HtmlDocument.ParseState.Tag)
@@ -714,7 +715,7 @@ namespace Shaman.Dom
                                 }
                                 else
                                 {
-                                    if (this._c == 62)
+                                    if (this._c == '>')
                                     {
                                         this.PushNodeNameEnd(this._index - 1);
                                         if (this._state == HtmlDocument.ParseState.Tag)
@@ -740,7 +741,7 @@ namespace Shaman.Dom
                     case HtmlDocument.ParseState.BetweenAttributes:
                         if (!this.NewCheck(nextIsLetter) && !HtmlDocument.IsWhiteSpace(this._c))
                         {
-                            if (this._c == 47 || this._c == 63)
+                            if (this._c == '/' || this._c == '?')
                             {
                                 if (this._currentnode != null && this._currentnode.TagName == "?document")
                                 {
@@ -749,14 +750,14 @@ namespace Shaman.Dom
                                         this._documentnode.SetAttributeValue(current.OriginalName, current.Value);
                                     }
                                 }
-                                if (this._obeySelfClosingTags || this._c == 63)
+                                if (!_isHtml || this._c == '?')
                                 {
                                     this._state = HtmlDocument.ParseState.EmptyTag;
                                 }
                             }
                             else
                             {
-                                if (this._c == 62)
+                                if (this._c == '>')
                                 {
                                     if (!this.PushNodeEnd(this._index, false))
                                     {
@@ -782,7 +783,7 @@ namespace Shaman.Dom
                     case HtmlDocument.ParseState.EmptyTag:
                         if (!this.NewCheck(nextIsLetter))
                         {
-                            if (this._c == 62)
+                            if (this._c == '>')
                             {
                                 if (!this.PushNodeEnd(this._index, true))
                                 {
@@ -820,7 +821,7 @@ namespace Shaman.Dom
                                 }
                                 else
                                 {
-                                    if (this._c == 62)
+                                    if (this._c == '>')
                                     {
                                         this.PushAttributeNameEnd(this._index - 1);
                                         if (!this.PushNodeEnd(this._index, false))
@@ -843,7 +844,7 @@ namespace Shaman.Dom
                     case HtmlDocument.ParseState.AttributeBeforeEquals:
                         if (!this.NewCheck(nextIsLetter) && !HtmlDocument.IsWhiteSpace(this._c))
                         {
-                            if (this._c == 62)
+                            if (this._c == '>')
                             {
                                 if (!this.PushNodeEnd(this._index, false))
                                 {
@@ -883,7 +884,7 @@ namespace Shaman.Dom
                             }
                             else
                             {
-                                if (this._c == 62)
+                                if (this._c == '>')
                                 {
                                     if (!this.PushNodeEnd(this._index, false))
                                     {
@@ -916,7 +917,7 @@ namespace Shaman.Dom
                             }
                             else
                             {
-                                if (this._c == 62)
+                                if (this._c == '>')
                                 {
                                     this.PushAttributeValueEnd(this._index - 1);
                                     if (!this.PushNodeEnd(this._index, false))
@@ -936,7 +937,7 @@ namespace Shaman.Dom
                         }
                         break;
                     case HtmlDocument.ParseState.Comment:
-                        if (this._c == 62)
+                        if (this._c == '>')
                         {
                             if (this._fullcomment)
                             {
@@ -1002,7 +1003,7 @@ namespace Shaman.Dom
                             if (flag)
                             {
                                 int num2 = (int)this.Text[this._index - 1 + 2 + this._currentnode.TagName.Length];
-                                if (num2 == 62 || HtmlDocument.IsWhiteSpace(num2))
+                                if (num2 == '>' || HtmlDocument.IsWhiteSpace(num2))
                                 {
                                     HtmlTextNode htmlTextNode = (HtmlTextNode)this.CreateNode(HtmlNodeType.Text, this._currentnode._outerstartindex + this._currentnode._outerlength);
                                     htmlTextNode._outerlength = this._index - 1 - htmlTextNode._outerstartindex;
@@ -1181,42 +1182,39 @@ namespace Shaman.Dom
             }
             return true;
         }
+
         private void PushNodeNameEnd(int index)
         {
             this._currentnode.TagName = this.Text.SubstringCached(this._currentNodeNameStartIndex, index - this._currentNodeNameStartIndex);
             if (this.Openednodes.Count == 1 && this._isHtml)
             {
-                string tagName = this._currentnode.TagName;
-                if (tagName != "html" && !tagName.StartsWith("?") && !tagName.StartsWith("!"))
+                string rootNode = this._currentnode.TagName;
+                if (rootNode != "html" && !rootNode.StartsWith("?") && !rootNode.StartsWith("!"))
                 {
-                    bool flag = false;
-                    bool flag2 = false;
+                    bool html = false;
+                    bool xml = false;
                     foreach (HtmlNode current in this.DocumentNode.ChildNodes)
                     {
-                        string tagName2 = current.TagName;
-                        if (tagName2 == "?xml")
+                        string other = current.TagName;
+                        if (other == "?xml")
                         {
-                            flag2 = true;
+                            xml = true;
                         }
-                        if (tagName2 == "html")
+                        if (other == "html")
                         {
-                            flag = true;
+                            html = true;
                         }
                     }
-                    if (flag2 && !flag)
+                    if (xml && !html)
                     {
 #if !SALTARELLE
                         this.Text.ReadToEnd();
 #endif
                         this._isHtml = false;
                     }
-                    if (flag2)
-                    {
-                        this._obeySelfClosingTags = true;
-                    }
                 }
             }
-            if (this.OptionFixNestedTags)
+            if (this.OptionFixNestedTags && _isHtml)
             {
                 this.FixNestedTags();
             }
