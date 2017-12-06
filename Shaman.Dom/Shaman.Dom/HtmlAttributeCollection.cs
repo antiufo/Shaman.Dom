@@ -50,7 +50,19 @@ namespace Shaman.Dom
 			}
 		}
 		private readonly HtmlNode _ownernode;
-		public HtmlAttribute this[string name]
+
+        public HtmlAttribute this[int index]
+        {
+            get
+            {
+                if (index >= this._ownernode._attributeCount) throw new IndexOutOfRangeException();
+                return this._ownernode._attributeArray[index];
+            }
+        }
+
+
+
+        public HtmlAttribute this[string name]
 		{
 			get
 			{

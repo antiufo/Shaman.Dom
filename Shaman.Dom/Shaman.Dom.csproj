@@ -18,9 +18,9 @@ Improved features:
 * Support for lazily switching document encoding when finding &lt;meta charset&gt;
 </Description>
     <AssemblyTitle>Shaman.Dom</AssemblyTitle>
-    <VersionPrefix>1.0.1.20</VersionPrefix>
+    <VersionPrefix>1.0.1.24</VersionPrefix>
     <Authors>Andrea Martinelli</Authors>
-    <TargetFrameworks>net46;net35;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks>net46;net35;netstandard2.0</TargetFrameworks>
     <AssemblyName>Shaman.Dom</AssemblyName>
     <AssemblyOriginatorKeyFile>Shaman.Dom.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
@@ -28,14 +28,19 @@ Improved features:
     <PackageId>Shaman.Dom</PackageId>
     <PackageTags>html;low-gc;gc;optimization;allocation;html;parsing;htmlagilitypack;performance</PackageTags>
     <PackageIconUrl>http://shaman.io/images/shaman-nuget-icon.png</PackageIconUrl>
-    <PackageProjectUrl>http://shaman.io/</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/antiufo/Shaman.Dom</PackageProjectUrl>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <DefineConstants>
+    </DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|AnyCPU'">
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Shaman.Dom.Saltarelle\**\*" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Shaman.ValueString" Version="1.0.2.29" />
+    <PackageReference Include="Shaman.ValueString" Version="1.0.2.32" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <Reference Include="System.Xml" />
@@ -46,7 +51,12 @@ Improved features:
     <Reference Include="System.Xml" />
     <Reference Include="System" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <PackageReference Include="System.Xml.ReaderWriter" Version="4.0.11" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
   </ItemGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <DefineConstants>$(DefineConstants);XPATH</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <DefineConstants>$(DefineConstants);XPATH</DefineConstants>
+  </PropertyGroup>
 </Project>
